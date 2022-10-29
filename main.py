@@ -3,7 +3,7 @@ from extract.economist import Economist
 
 
 economist = Economist()
-ECONOMIST_PAGE_LIMIT = 265
+ECONOMIST_PAGE_LIMIT = 266
 
 articles = economist.get_articles(
     url="https://www.economist.com/finance-and-economics?page=1",
