@@ -11,9 +11,7 @@ class Economist(Extractor):
     def get_single_article_url(self, articles):
         article_url = []
         for link in articles:
-
             t = link.find("h3", attrs={"class": "css-na6i28 eifj80y0"})
-
             url = t.a["href"]
             article_url.append(url)
         return article_url
@@ -38,7 +36,7 @@ class Economist(Extractor):
                 # print({"date": date.text, "body": body.text, "title": subject.text})
                 data.append(
                     {
-                        "title": subject.extract(),
+                        "title": subject.text,
                         "date": date.text,
                         "body": body.text,
                     }

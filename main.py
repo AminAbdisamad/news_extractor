@@ -17,7 +17,3 @@ print(json.dumps(articles, indent=4))
 # number = 10
 # for n in range(1, number + 1):
 #     print(f"Number {n}")
-
-
-text = "ali is good"
-im = text.replace
