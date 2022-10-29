@@ -5,33 +5,44 @@ class Economist(Extractor):
     def get_articles(self, *, url, section, value):
         articles = self.find(url=url, section=section, value=value)
         links = self.get_single_article_url(articles)
-        data = self.get_body(links)
+        data = self.get_full_articles(links)
         return data
 
     def get_single_article_url(self, articles):
         article_url = []
         for link in articles:
-            t = link.find("h3", attrs={"class": "css-1e1hbwe evsrcsw0"})
+
+            t = link.find("h3", attrs={"class": "css-na6i28 eifj80y0"})
+
             url = t.a["href"]
             article_url.append(url)
         return article_url
 
-    def get_body(self, links):
+    def get_full_articles(self, links):
         data = []
-        articles = []
+        full_articles = []
         for link in links:
-            body = self.find(
+
+            article_info = self.find(
                 url=f"https://www.economist.com/{link}",
                 section="div",
-                value="css-1nza9ip e89g54i0",
+                value="css-1qjp74c er0dv2y0",
             )
-            articles.append(body)
-        for article in articles[0]:
-            date = article.find("time", attrs={"class": "css-94e3d0 e11vvcj40"})
-            body = article.find("div", attrs={"class": "css-1jx1v8p e15vdjh41"})
-            subject = article.find("h1", attrs={"class": "css-1bo5zl0 eoacr0f0"})
-            print({"date": date.text, "body": body.text, "title": subject.text})
-            # data.append({"title": subject.text, "date": date.text, "body": body.text})
+            full_articles.append(article_info)
+        for articles in full_articles:
+            for article in articles:
+                date = article.find("time", attrs={"class": "css-j5ehde e1fl1tsy0"})
+                body = article.find("div", attrs={"class": "css-13gy2f5 e1prll3w0"})
+                subject = article.find("h1", attrs={"class": "css-1bo5zl0 e164j1a30"})
+
+                # print({"date": date.text, "body": body.text, "title": subject.text})
+                data.append(
+                    {
+                        "title": subject.extract(),
+                        "date": date.text,
+                        "body": body.text,
+                    }
+                )
         return data
 
 

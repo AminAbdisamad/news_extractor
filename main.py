@@ -1,22 +1,23 @@
 import json
 from extract.economist import Economist
 
+
 economist = Economist()
+ECONOMIST_PAGE_LIMIT = 265
+
 articles = economist.get_articles(
-    url="https://www.economist.com/finance-and-economics",
+    url="https://www.economist.com/finance-and-economics?page=1",
     section="div",
-    value="css-16uw8sa eprz4kh0",
+    value="css-mi70rv e16rqvvr0",
 )
-# print(json.dumps(articles, indent=4))
 
-# news_articles = [
-#     ["url", "section", "cls"],
-#     ["url", "section", "cls"],
-#     ["url", "section", "cls"],
-# ]
 
-# for article in news_articles:
-#     url = article[0]
-#     section = article[1]
-#     cls_value = article[2]
-#     news = extract_by_class(url, section, cls_value)
+print(json.dumps(articles, indent=4))
+
+# number = 10
+# for n in range(1, number + 1):
+#     print(f"Number {n}")
+
+
+text = "ali is good"
+im = text.replace
