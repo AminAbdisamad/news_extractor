@@ -22,6 +22,3 @@ class Extractor:
             },
         )
         return l
-
-
-eco = Extractor()
