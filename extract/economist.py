@@ -65,7 +65,7 @@ class Economist(BaseExtractor):
             writer = csv.writer(nyt)
             writer.writerow(fieldnames)
 
-            for page in range(60, pages):
+            for page in range(210, pages):
                 time.sleep(1)
                 data = self.get_articles(
                     url=url, section=section, value=value, page=page
