@@ -1,9 +1,11 @@
+import csv, time
 from extract import BaseExtractor
 
 
 class Economist(BaseExtractor):
-    def get_articles(self, *, url, section, value):
-        articles = self.find(url=url, section=section, value=value)
+    def get_articles(self, *, url, page, section, value):
+        website_url = f"{url}?page={page}"
+        articles = self.find(url=website_url, section=section, value=value)
         links = self.get_single_article_url(articles)
         data = self.get_full_articles(links)
         return data
@@ -39,12 +41,40 @@ class Economist(BaseExtractor):
                 # print({"date": date.text, "body": body.text, "title": subject.text})
                 data.append(
                     {
-                        "title": self.clean_text(subject.text),
                         "date": self.clean_text(date.text),
+                        "title": self.clean_text(subject.text),
                         "body": self.clean_text(body.text),
                     }
                 )
         return data
+
+    def save_csv(self, *, url, section, value, pages):
+        with open(
+            "corpus/economist.csv",
+            mode="a",
+            encoding="utf-8",
+            # append to the file,
+            newline="",
+        ) as nyt:
+            fieldnames = [
+                "date",
+                "title",
+                "body",
+            ]
+            # writer = csv.DictWriter(nyt, fieldnames=fieldnames)
+            writer = csv.writer(nyt)
+            writer.writerow(fieldnames)
+
+            for page in range(20, pages):
+                time.sleep(1)
+                data = self.get_articles(
+                    url=url, section=section, value=value, page=page
+                )
+                if not data:
+                    break
+                print(f"Extracting data from page {page} ")
+                for row in data:
+                    writer.writerow(row.values())
 
 
 #     for article in main_article:

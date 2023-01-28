@@ -5,7 +5,7 @@ import requests
 
 
 # How to create a class in python
-class Extractor:
+class BaseExtractor:
     # A class can have one more more methods
     # A method is a function inside a class
     # Fuction is a block of related code
