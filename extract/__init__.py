@@ -22,3 +22,13 @@ class Extractor:
             },
         )
         return l
+
+    def clean_text(self, text):
+        """@description: clean the data
+
+        @return: cleaned data
+        """
+        symbols = ["(", ")", ".", ",", "\u2014", "\u2019s", "\u25a0"]
+        for symbol in symbols:
+            text = text.replace(symbol, "")
+        return text

@@ -1,9 +1,15 @@
 import requests
+import time
 import os
+from datetime import date
+
+
 from pprint import pprint
 from dataclasses import dataclass
 import json
+import csv
 from dotenv import load_dotenv
+from extract import BaseExtractor
 
 load_dotenv()
 
@@ -39,16 +45,16 @@ API_KEY = os.getenv("NYT_API_KEY")
 
 
 @dataclass
-class NYTimes:
-    def clean(self, text):
-        """@description: clean the data
+class NYTimes(BaseExtractor):
+    # def clean(self, text):
+    #     """@description: clean the data
 
-        @return: cleaned data
-        """
-        symbols = ["(", ")", ".", ",", "\u2014", "\u2019s"]
-        for symbol in symbols:
-            text = text.replace(symbol, "")
-        return text
+    #     @return: cleaned data
+    #     """
+    #     symbols = ["(", ")", ".", ",", "\u2014", "\u2019s"]
+    #     for symbol in symbols:
+    #         text = text.replace(symbol, "")
+    #     return text
 
     def display(self):
         """@description: display the data
@@ -67,59 +73,101 @@ class NYTimes:
             f"https://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk:({category})&api-key={API_KEY}&page={page}&begin_date={start_date}&end_date={end_date}"
         )
         r.headers["content-type"]
-        data = r.json()
 
-        articles = data["response"]["docs"]
+        data = r.json()
+        # print(data)
+
+        try:
+            articles = data["response"]["docs"]
+        except KeyError as e:
+            print(f"Error: {e}")
+            print(r.status_code)
+            print(r.headers)
+            articles = []
 
         return self.get_articles(articles)
 
     def get_articles(self, articles) -> list["dict"]:
         data = []
         for article in articles:
-            body = self.clean(article["abstract"])
-            body += self.clean(article["lead_paragraph"])
-            subject = self.clean(article["headline"]["main"])
-            date = self.clean(article["pub_date"])
+            body = self.clean_text(article["abstract"])
+            body += self.clean_text(article["lead_paragraph"])
+            subject = self.clean_text(article["headline"]["main"])
+            date = self.clean_text(article["pub_date"])
             keywords = " ".join(
-                [self.clean(keyword["value"]) for keyword in article["keywords"]]
+                [self.clean_text(keyword["value"]) for keyword in article["keywords"]]
             )
 
             data.append(
                 {
-                    "Body": body,
                     "Subject": subject,
+                    "Body": body,
                     "Date": date,
                     "keywords": keywords,
                 },
             )
+            # Save to csv
+
         return data
 
-    def save_csv(self):
-        """@description: save the data as csv file
+    def save_csv(self, categories: list, start_date, end_date, page):
+        with open(
+            "corpus/nyt_news.csv",
+            mode="a",
+            encoding="utf-8",
+            # append to the file,
+            newline="",
+        ) as nyt:
+            fieldnames = ["title", "body", "date", "keywords"]
+            # writer = csv.DictWriter(nyt, fieldnames=fieldnames)
+            writer = csv.writer(nyt)
+            writer.writerow(fieldnames)
+            for category in categories:
+                for page in range(page):
+                    time.sleep(
+                        5
+                    )  # we want to sleep for 5 seconds before making another request to the api
+                    data = self.main(category, start_date, end_date, page)
+                    if not data:
+                        break
+                    print(f"Extracting data from page {page} of category {category}...")
+                    for row in data:
+                        writer.writerow(row.values())
 
-        @return: save the data as csv file
-        """
-        pass
 
-
-NY_NEWS_CATEGORIES = "Your Money"
+NY_NEWS_CATEGORIES = ["Business", "Your Money", "Financial", "Economic Analysis"]
 START_DATE = "20150101"
 END_DATE = "20230127"
-PAGE_NUMBER = 100
-
+PAGE_NUMBER = 200
 
 ny = NYTimes()
-t = []
-for category in NY_NEWS_CATEGORIES:
-    for page in range(PAGE_NUMBER):
-        data = ny.main(
-            category=category, start_date=START_DATE, end_date=END_DATE, page=page
-        )
-        t.append(data)
-        # print(json.dumps(data, indent=4))
+
+ny.save_csv(NY_NEWS_CATEGORIES, START_DATE, END_DATE, PAGE_NUMBER)
+# for category in NY_NEWS_CATEGORIES:
+#     for page in range(PAGE_NUMBER):
+#         # sleep for 2 second before making another request
+#         time.sleep(5)
+#         data = ny.main(
+#             category=category, start_date=START_DATE, end_date=END_DATE, page=page
+#         )
+
+#         if not data:
+#             break
+#         print(f"Extracting data from page {page} of category {category}...")
+#         ny.save_csv(data)
+# for page in range(PAGE_NUMBER):
+# data = ny.main(
+#     category=NY_NEWS_CATEGORIES, start_date=START_DATE, end_date=END_DATE, page=1
+# )
+# ny.save_csv(data)
+# print(json.dumps(data, indent=4))
 
 
 # data = ny.main(category=MONEY, start_date=START_DATE, end_date=END_DATE, page=0)
 # print(json.dumps(data, indent=4))
 
-print(len(t))
+# pprint(t)
+
+
+# !@description: Please start at 120 for business category next ime
+# ! and 0 from the other categories
