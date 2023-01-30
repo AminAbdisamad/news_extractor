@@ -2,6 +2,7 @@ import re
 from bs4 import BeautifulSoup as Soup
 from urllib.request import urlopen
 import requests
+from urllib.request import urlopen
 
 
 # How to create a class in python
@@ -9,11 +10,18 @@ class BaseExtractor:
     # A class can have one more more methods
     # A method is a function inside a class
     # Fuction is a block of related code
-    def find(self, *, url, section, value):
+    def find(self, *, url: str, section: str, value: str):
         """Find takes three arguments (url, section,value)
         and returns a list of elements found
+
+        @notes: please keep in mind that this method uses
+        the requests library to make a request to the url
         """
-        page = requests.get(url)
+        page = requests.get(
+            "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
+        )
+        print(page.status_code, page.content)
+
         bs = Soup(page.content, "html.parser")
         l = bs.find_all(
             section,
@@ -22,6 +30,26 @@ class BaseExtractor:
             },
         )
         return l
+
+    def find_with_urlopen(self, *, url: str, section: str, value: str):
+        """Find takes three arguments (url, section,value)
+        and returns a list of elements found
+
+        @notes: please keep in mind that this method uses
+        the requests library to make a request to the url
+        """
+
+        with urlopen(url) as web:
+            page = web.read()
+
+            bs = Soup(page, "html.parser")
+            l = bs.find_all(
+                section,
+                attrs={
+                    "class": value,
+                },
+            )
+            return l
 
     def clean_text(self, text):
         """@description: clean the data
@@ -32,3 +60,7 @@ class BaseExtractor:
         for symbol in symbols:
             text = text.replace(symbol, "")
         return text
+
+    def graphql(self, *, url: str, body: str) -> tuple[int, dict]:
+        r = requests.post(url, json={"query": body})
+        return (r.status_code, r.json())

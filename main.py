@@ -2,6 +2,7 @@ import json
 from extract.economist import Economist
 from extract.yenisafak import YeniSafak
 
+
 economist = Economist()
 ECONOMIST_PAGE_LIMIT = 272
 
@@ -34,4 +35,9 @@ feed(page:1, limit:4,filter: {contentType: null, categories: ["606cb5649e7f71a29
 """
 
 yeni = YeniSafak()
-yeni.graphql(url=url, body=body)
+articles = yeni.get_articles(url=url, body=body)
+print(json.dumps(articles, indent=4))
+# import requests
+
+
+# limit 5050

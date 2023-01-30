@@ -1,16 +1,41 @@
 import requests
+from time import sleep
 from . import BaseExtractor
 
 # ys-detail-content
 
 
 class YeniSafak(BaseExtractor):
-    def graphql(self, *, url, body):
-        r = requests.post(url, json={"query": body})
-        # return r.json()
-        print("response status code: ", r.status_code)
-        if r.status_code == 200:
-            print("response : ", r.content)
+    BASE_URL = "https://www.yenisafak.com/en"
+
+    def get_articles(self, *, url: str, body: str):
+        yenisafak = []
+        status_code, content = self.graphql(url=url, body=body)
+        if status_code == 200:
+
+            data = content["data"]["feed"]
+            for article in data:
+                yenisafak.append(
+                    {
+                        "title": article["title"],
+                        "date": article["publishDate"],
+                        "url": self.BASE_URL + article["url"],
+                    }
+                )
+        sleep(5)
+        print(yenisafak)
+        for article in yenisafak:
+
+            r = self.find_with_urlopen(
+                url=article["url"], section="p", value="ys-paragraph-node"
+            )
+
+            article["body"] = " ".join([self.clean_text(p.text) for p in r])
+
+            yenisafak.append({"body": article["body"]})
+        # print(yenisafak)
+        return yenisafak
+        # print(yenisafak)
 
 
 # 5050
