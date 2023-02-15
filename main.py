@@ -4,14 +4,14 @@ from extract.yenisafak import YeniSafak
 
 
 economist = Economist()
-ECONOMIST_PAGE_LIMIT = 272
+ECONOMIST_PAGE_LIMIT = 273
 
-# economist.save_csv(
-#     url="https://www.economist.com/finance-and-economics",
-#     section="div",
-#     value="css-e6sfh4 e1mrg8dy0",
-#     pages=ECONOMIST_PAGE_LIMIT,
-# )
+economist.save_csv(
+    url="https://www.economist.com/finance-and-economics",
+    section="div",
+    value="css-e6sfh4 e1mrg8dy0",
+    pages=ECONOMIST_PAGE_LIMIT,
+)
 
 
 # print(json.dumps(articles, indent=4))
@@ -34,9 +34,9 @@ feed(page:1, limit:4,filter: {contentType: null, categories: ["606cb5649e7f71a29
 }
 """
 
-yeni = YeniSafak()
-articles = yeni.get_articles(url=url, body=body)
-print(json.dumps(articles, indent=4))
+# yeni = YeniSafak()
+# articles = yeni.get_articles(url=url, body=body)
+# print(json.dumps(articles, indent=4))
 # import requests
 
 

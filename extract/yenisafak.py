@@ -7,7 +7,7 @@ from . import BaseExtractor
 
 class YeniSafak(BaseExtractor):
     BASE_URL = "https://www.yenisafak.com/en"
-
+    # "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
     def get_articles(self, *, url: str, body: str):
         yenisafak = []
         status_code, content = self.graphql(url=url, body=body)

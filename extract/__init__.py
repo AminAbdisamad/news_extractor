@@ -18,9 +18,8 @@ class BaseExtractor:
         the requests library to make a request to the url
         """
         page = requests.get(
-            "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
+            url,
         )
-        print(page.status_code, page.content)
 
         bs = Soup(page.content, "html.parser")
         l = bs.find_all(

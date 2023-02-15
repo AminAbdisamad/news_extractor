@@ -38,12 +38,13 @@ class Economist(BaseExtractor):
                 )
                 subject = article.find("h1", attrs={"class": "css-1bo5zl0 e164j1a30"})
 
-                # print({"date": date.text, "body": body.text, "title": subject.text})
+                # print({"date": date.text, "body": body, "title": subject})
+
                 data.append(
                     {
-                        "date": self.clean_text(date.text),
-                        "title": self.clean_text(subject.text),
-                        "body": self.clean_text(body.text),
+                        "date": self.clean_text(date.text if date else ""),
+                        "title": self.clean_text(subject.text if subject else ""),
+                        "body": self.clean_text(body.text if body else ""),
                     }
                 )
         return data
@@ -65,7 +66,7 @@ class Economist(BaseExtractor):
             writer = csv.writer(nyt)
             writer.writerow(fieldnames)
 
-            for page in range(248, pages):
+            for page in range(271, pages):
                 time.sleep(1)
                 data = self.get_articles(
                     url=url, section=section, value=value, page=page
@@ -75,18 +76,3 @@ class Economist(BaseExtractor):
                 print(f"Extracting data from page {page} ")
                 for row in data:
                     writer.writerow(row.values())
-
-
-#     for article in main_article:
-#         date = article.find("time", attrs={"class": "css-94e3d0 e11vvcj40"})
-#         article_body = article.find("div", attrs={"class": "css-8oxbol e15vdjh41"})
-#         economist.append({"title": title, "date": date.text, "body": article_body.text})
-#     # body = element.find("p", attrs={"class": "css-qnkbrf ey69q3h0"})
-#     # date =
-#     # print("title ", title)
-#     # print("url", url)
-#     # print("summary", body.text)
-
-
-# print()
-# print(economist.length)
