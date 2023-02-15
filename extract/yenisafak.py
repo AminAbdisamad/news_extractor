@@ -39,3 +39,15 @@ class YeniSafak(BaseExtractor):
 
 
 # 5050
+
+
+YENI_SAFAK_QUERY = """
+    {
+    feed(page:1, limit:4,filter: {contentType: null, categories: ["606cb5649e7f71a2960c11cf"] })
+    {
+            title
+            publishDate
+            url
+    }
+    }
+    """

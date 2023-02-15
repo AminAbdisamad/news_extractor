@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import json
 import csv
 from dotenv import load_dotenv
-from extract import BaseExtractor
+from . import BaseExtractor
 
 load_dotenv()
 
@@ -123,7 +123,7 @@ class NYTimes(BaseExtractor):
             writer = csv.writer(nyt)
             writer.writerow(fieldnames)
             for category in categories:
-                for page in range(page):
+                for page in range(120, page):
                     time.sleep(
                         5
                     )  # we want to sleep for 5 seconds before making another request to the api
@@ -135,14 +135,6 @@ class NYTimes(BaseExtractor):
                         writer.writerow(row.values())
 
 
-NY_NEWS_CATEGORIES = ["Business", "Your Money", "Financial", "Economic Analysis"]
-START_DATE = "20150101"
-END_DATE = "20230127"
-PAGE_NUMBER = 200
-
-ny = NYTimes()
-
-ny.save_csv(NY_NEWS_CATEGORIES, START_DATE, END_DATE, PAGE_NUMBER)
 # for category in NY_NEWS_CATEGORIES:
 #     for page in range(PAGE_NUMBER):
 #         # sleep for 2 second before making another request
