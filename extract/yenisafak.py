@@ -17,25 +17,25 @@ class YeniSafak(BaseExtractor):
             for article in data:
                 yenisafak.append(
                     {
-                        "title": article["title"],
-                        "date": article["publishDate"],
-                        "url": self.BASE_URL + article["url"],
+                        "title": article.get("title"),
+                        "date": article.get("publishDate"),
+                        "url": self.BASE_URL + article.get("url"),
                     }
                 )
-        sleep(5)
-        print(yenisafak)
+        sleep(1)
+
         for article in yenisafak:
 
             r = self.find_with_urlopen(
-                url=article["url"], section="p", value="ys-paragraph-node"
+                url=article.get("url"), section="p", value="ys-paragraph-node"
             )
+            print(r)
 
             article["body"] = " ".join([self.clean_text(p.text) for p in r])
 
-            yenisafak.append({"body": article["body"]})
-        # print(yenisafak)
+            yenisafak.append({"body": article.get("body")})
+
         return yenisafak
-        # print(yenisafak)
 
 
 # 5050

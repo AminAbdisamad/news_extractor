@@ -38,7 +38,7 @@ class BaseExtractor:
         the requests library to make a request to the url
         """
 
-        with urlopen(url) as web:
+        with urlopen(url, timeout=1) as web:
             page = web.read()
 
             bs = Soup(page, "html.parser")
