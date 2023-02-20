@@ -56,15 +56,13 @@ class YeniSafak(BaseExtractor):
             writer = csv.writer(nyt)
             writer.writerow(fieldnames)
             for row in data:
+                print("Extracting data from Yeni Safak")
                 writer.writerow(row.values())
-
-
-# 5050
 
 
 YENI_SAFAK_QUERY = """
     {
-    feed(page:1, limit:14,filter: {contentType: null, categories: ["606cb5649e7f71a2960c11cf"] })
+    feed(page:1, limit:5050,filter: {contentType: null, categories: ["606cb5649e7f71a2960c11cf"] })
     {
             title
             publishDate
