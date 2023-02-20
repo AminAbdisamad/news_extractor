@@ -1,9 +1,15 @@
 import requests
+import csv
+import time
 from pprint import pprint
+from datetime import datetime
 from time import sleep
 from . import BaseExtractor
 
+
 # ys-detail-content
+
+date_format = "%d/%m/%y"
 
 
 class YeniSafak(BaseExtractor):
@@ -11,40 +17,46 @@ class YeniSafak(BaseExtractor):
     # "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
     def get_article_meta(self, *, url: str, body: str):
         yenisafak = []
+        # change to Turkiye everwhere theres  T\u00fcrkiye
+        word = "Turkiye"
+        comma = "'"
 
         status_code, content = self.graphql(url=url, body=body)
         if status_code == 200:
 
             data = content["data"]["feed"]
             for article in data:
+
                 yenisafak.append(
                     {
-                        "title": article.get("title"),
+                        "date": datetime.fromisoformat(
+                            article.get("publishDate").replace("Z", "+00:00")
+                        ).strftime("%B %d %Y"),
+                        "title": article.get("title")
+                        .replace("T\u00fcrkiye", word)
+                        .replace("\u2019", comma),
                         "summary": article.get("spot"),
-                        "date": article.get("publishDate"),
                         # "url": self.BASE_URL + article.get("url"),
                     }
                 )
 
-        return yenisafak
+        self.save_csv(data=yenisafak)
 
-    # def get_full_article(self, *, urls: str):
-    #     data = []
-    #     for url in urls:
+    def save_csv(self, *, data: list):
 
-    #         title = self.find_with_urlopen(
-    #             url=url, section="p", value="ys-paragraph-node"
-    #         )
-    #         date = self.find_with_urlopen(
-    #             url=url, section="p", value="ys-paragraph-node"
-    #         )
-    #         body = self.find_with_urlopen(
-    #             url=url, section="p", value="ys-paragraph-node"
-    #         )
-
-    #         formatted_body = " ".join([self.clean_text(p.text) for p in r])
-
-    # yenisafak.append({"body": article.get("body")})
+        with open(
+            "corpus/yenisafak.csv",
+            mode="a",
+            encoding="utf-8",
+            # append to the file,
+            newline="",
+        ) as nyt:
+            fieldnames = ["date", "title", "summary"]
+            # writer = csv.DictWriter(nyt, fieldnames=fieldnames)
+            writer = csv.writer(nyt)
+            writer.writerow(fieldnames)
+            for row in data:
+                writer.writerow(row.values())
 
 
 # 5050
