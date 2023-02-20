@@ -9,7 +9,7 @@ from . import BaseExtractor
 class YeniSafak(BaseExtractor):
     BASE_URL = "https://www.yenisafak.com/en"
     # "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
-    def get_articles(self, *, url: str, body: str):
+    def get_article_meta(self, *, url: str, body: str):
         yenisafak = []
 
         status_code, content = self.graphql(url=url, body=body)
@@ -20,24 +20,31 @@ class YeniSafak(BaseExtractor):
                 yenisafak.append(
                     {
                         "title": article.get("title"),
+                        "summary": article.get("spot"),
                         "date": article.get("publishDate"),
-                        "url": self.BASE_URL + article.get("url"),
+                        # "url": self.BASE_URL + article.get("url"),
                     }
                 )
-        sleep(1)
-
-        for article in yenisafak:
-
-            r = self.find_with_urlopen(
-                url=article.get("url"), section="p", value="ys-paragraph-node"
-            )
-            print(r)
-
-            # article["body"] = " ".join([self.clean_text(p.text) for p in r])
-
-            # yenisafak.append({"body": article.get("body")})
 
         return yenisafak
+
+    # def get_full_article(self, *, urls: str):
+    #     data = []
+    #     for url in urls:
+
+    #         title = self.find_with_urlopen(
+    #             url=url, section="p", value="ys-paragraph-node"
+    #         )
+    #         date = self.find_with_urlopen(
+    #             url=url, section="p", value="ys-paragraph-node"
+    #         )
+    #         body = self.find_with_urlopen(
+    #             url=url, section="p", value="ys-paragraph-node"
+    #         )
+
+    #         formatted_body = " ".join([self.clean_text(p.text) for p in r])
+
+    # yenisafak.append({"body": article.get("body")})
 
 
 # 5050
@@ -50,6 +57,7 @@ YENI_SAFAK_QUERY = """
             title
             publishDate
             url
+            spot
     }
     }
     """

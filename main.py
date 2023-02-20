@@ -30,8 +30,8 @@ def extract_from_yenisafak():
     # Yenisafa news
     url = "https://api.piri.net/graphql/yenisafaken/"
     yeni = YeniSafak()
-    articles = yeni.get_articles(url=url, body=YENI_SAFAK_QUERY)
-    # print(json.dumps(articles, indent=4))
+    articles = yeni.get_article_meta(url=url, body=YENI_SAFAK_QUERY)
+    print(json.dumps(articles, indent=4))
     # limit 5050
 
 
