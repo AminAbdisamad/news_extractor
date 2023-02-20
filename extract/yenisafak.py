@@ -1,4 +1,5 @@
 import requests
+from pprint import pprint
 from time import sleep
 from . import BaseExtractor
 
@@ -10,6 +11,7 @@ class YeniSafak(BaseExtractor):
     # "https://www.yenisafak.com/en/economy/turkiye-to-receive-14b-cubic-meters-of-gas-from-oman-per-year-3659808"
     def get_articles(self, *, url: str, body: str):
         yenisafak = []
+
         status_code, content = self.graphql(url=url, body=body)
         if status_code == 200:
 
@@ -31,9 +33,9 @@ class YeniSafak(BaseExtractor):
             )
             print(r)
 
-            article["body"] = " ".join([self.clean_text(p.text) for p in r])
+            # article["body"] = " ".join([self.clean_text(p.text) for p in r])
 
-            yenisafak.append({"body": article.get("body")})
+            # yenisafak.append({"body": article.get("body")})
 
         return yenisafak
 
@@ -43,7 +45,7 @@ class YeniSafak(BaseExtractor):
 
 YENI_SAFAK_QUERY = """
     {
-    feed(page:1, limit:4,filter: {contentType: null, categories: ["606cb5649e7f71a2960c11cf"] })
+    feed(page:1, limit:14,filter: {contentType: null, categories: ["606cb5649e7f71a2960c11cf"] })
     {
             title
             publishDate

@@ -38,7 +38,7 @@ class BaseExtractor:
         the requests library to make a request to the url
         """
 
-        with urlopen(url, timeout=1) as web:
+        with urlopen(url, timeout=3) as web:
             page = web.read()
 
             bs = Soup(page, "html.parser")
@@ -61,5 +61,5 @@ class BaseExtractor:
         return text
 
     def graphql(self, *, url: str, body: str) -> tuple[int, dict]:
-        r = requests.post(url, json={"query": body})
+        r = requests.post(url, json={"query": body}, timeout=2.5)
         return (r.status_code, r.json())
