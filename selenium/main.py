@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from pprint import pprint
 
 # import WebDriverWait
 
@@ -15,9 +16,6 @@ driver.maximize_window()
 print("Window is maximized")
 driver.implicitly_wait(0.5)
 print("Implicit wait is applied")
-
-
-# [{title:"some title", date:"some date"}]
 
 
 def extract(elements):
@@ -33,38 +31,42 @@ def extract(elements):
     return found_articles
 
 
-# elements = driver.find_elements(By.TAG_NAME, "ul")
-# articles = extract(elements)
-
-# Load more button
-
-# load_more_button = driver.find_element(By.CLASS_NAME, "loadMoreArticleButton")
-# load_more_button = driver.find_element(
-#     By.XPATH, "/html/body/section/div[2]/div[4]/div[1]/div/div[4]/a"
-# )
-
-loadingButton = WebDriverWait(driver, 30).until(
-    EC.presence_of_all_elements_located(
-        (By.XPATH, "/html/body/section/div[2]/div[4]/div[1]/div/div[4]/a")
+btn = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located(
+        (By.CSS_SELECTOR, "a[data-view='ajax_section_articles']")
     )
 )
 
-# driver.implicitly_wait(15)
-# load_more_button.click()
-# driver.implicitly_wait(15)
-# print(load_more_button)
-
-# elements = driver.find_elements(By.TAG_NAME, "ul")
-# articles += extract(elements)
+unique_articles = set()
 
 
-# print("Number of articles: ", len(articles))
-# print(articles)
+# Scroll to the button's location
+driver.execute_script("arguments[0].scrollIntoView();", btn)
 
+# # Click the button using JavaScript
+driver.execute_script("arguments[0].click();", btn)
 
-# click = ActionChains(driver).click(load_more_button).perform()
-# driver.implicitly_wait(15)
-# time.sleep(2)
-# print(click)
+while btn is not None and len(unique_articles) < 100:
+    # Click the button using JavaScript
+    driver.execute_script("arguments[0].click();", btn)
+
+    try:
+        # Wait for new articles to be loaded
+        data = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.TAG_NAME, "ul"))
+        )
+        articles = extract(data)
+        pprint(articles)
+
+        # Find the new button to click
+        btn = driver.find_element(
+            By.CSS_SELECTOR,
+            "a[data-view='ajax_section_articles'][data-llmit_articles='100']",
+        )
+
+    except:
+        # If no new button is found, set button to None to exit the loop
+        button = None
+
 
 driver.quit()
