@@ -4,6 +4,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pprint import pprint
+import csv
 
 # import WebDriverWait
 
@@ -24,11 +25,26 @@ def extract(elements):
         if el.get_attribute("class") == "items_list":
             articels = el.find_elements(By.TAG_NAME, "li")
             for article in articels:
+                link = article.find_element(By.TAG_NAME, "a")
                 title = article.text.split("\n")[0]
                 date = article.text.split("\n")[1]
-                found_articles.append({"title": title, "date": date})
+                found_articles.append(
+                    {"title": title, "date": date, "url": link.get_attribute("href")}
+                )
             break
     return found_articles
+
+
+def save_csv(articles):
+    with open(
+        "corpus/daily_sabah_summary.csv", mode="a", encoding="utf-8", newline=""
+    ) as f:
+        fieldnames = ["title", "date", "url"]
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for article in articles:
+            print("inside csv", article)
+            writer.writerow(article)
 
 
 btn = WebDriverWait(driver, 10).until(
@@ -46,7 +62,7 @@ driver.execute_script("arguments[0].scrollIntoView();", btn)
 # # Click the button using JavaScript
 driver.execute_script("arguments[0].click();", btn)
 
-while btn is not None and len(unique_articles) < 100:
+while btn is not None:
     # Click the button using JavaScript
     driver.execute_script("arguments[0].click();", btn)
 
@@ -56,7 +72,7 @@ while btn is not None and len(unique_articles) < 100:
             EC.presence_of_all_elements_located((By.TAG_NAME, "ul"))
         )
         articles = extract(data)
-        pprint(articles)
+        # save_csv(articles)
 
         # Find the new button to click
         btn = driver.find_element(
@@ -68,5 +84,7 @@ while btn is not None and len(unique_articles) < 100:
         # If no new button is found, set button to None to exit the loop
         button = None
 
+
+# Create function that saves the data to a csv file
 
 driver.quit()
